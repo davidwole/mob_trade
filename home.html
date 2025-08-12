@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Forex Trading Platform</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f0f23 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        color: white;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, #00d4ff, #0099cc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+
+      .account-info {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .account-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px 25px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .panel h2 {
+        margin-bottom: 20px;
+        color: #00d4ff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #ccc;
+      }
+
+      select,
+      input,
+      textarea,
+      button {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+        font-size: 14px;
+      }
+
+      button {
+        cursor: pointer;
+        background: linear-gradient(45deg, #00d4ff, #0099cc);
+        border: none;
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .voice-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      #voiceBtn {
+        background: linear-gradient(45deg, #ff4757, #ff3742);
+        flex: 1;
+      }
+
+      #voiceBtn.recording {
+        background: linear-gradient(45deg, #ff6b7a, #ff4757);
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .transcription-status {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+        min-height: 50px;
+        display: none;
+      }
+
+      .transcription-status.active {
+        display: block;
+      }
+
+      .transcription-status.listening {
+        border-color: #ff4757;
+        background: rgba(255, 71, 87, 0.1);
+        animation: pulse-border 1s infinite;
+      }
+
+      @keyframes pulse-border {
+        0% {
+          border-color: #ff4757;
+        }
+        50% {
+          border-color: #ff6b7a;
+        }
+        100% {
+          border-color: #ff4757;
+        }
+      }
+
+      .interim-text {
+        color: #ccc;
+        font-style: italic;
+      }
+
+      .final-text {
+        color: white;
+        font-weight: bold;
+      }
+
+      .voice-indicator {
+        display: inline-block;
+        margin-left: 10px;
+      }
+
+      .voice-wave {
+        display: inline-block;
+        width: 4px;
+        height: 20px;
+        background: #ff4757;
+        margin: 0 1px;
+        animation: voice-wave 1s infinite;
+      }
+
+      .voice-wave:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .voice-wave:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .voice-wave:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes voice-wave {
+        0%,
+        100% {
+          height: 5px;
+        }
+        50% {
+          height: 20px;
+        }
+      }
+
+      .voice-commands {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .voice-commands h4 {
+        color: #00d4ff;
+        margin-bottom: 10px;
+      }
+
+      .voice-commands ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .voice-commands li {
+        padding: 5px 0;
+        color: #ccc;
+        font-size: 0.9em;
+      }
+
+      .voice-commands li:before {
+        content: "🎤 ";
+        margin-right: 5px;
+      }
+
+      .analysis-result {
+        background: rgba(0, 212, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        border: 1px solid rgba(0, 212, 255, 0.3);
+      }
+
+      .recommendation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 15px 0;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+      }
+
+      .recommendation.buy {
+        border-left: 4px solid #00ff88;
+      }
+      .recommendation.sell {
+        border-left: 4px solid #ff4757;
+      }
+      .recommendation.hold {
+        border-left: 4px solid #ffa726;
+      }
+
+      .trading-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .buy-btn {
+        background: linear-gradient(45deg, #00ff88, #00cc6a);
+        flex: 1;
+      }
+
+      .sell-btn {
+        background: linear-gradient(45deg, #ff4757, #ff3742);
+        flex: 1;
+      }
+
+      .chart-container {
+        grid-column: 1 / -1;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .positions-container {
+        grid-column: 1 / -1;
+        margin-top: 30px;
+      }
+
+      .positions-grid {
+        display: grid;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .position-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .position-card.profit {
+        border-left: 4px solid #00ff88;
+      }
+
+      .position-card.loss {
+        border-left: 4px solid #ff4757;
+      }
+
+      .close-btn {
+        background: linear-gradient(45deg, #ffa726, #ff8a65);
+        padding: 8px 16px;
+        font-size: 12px;
+        width: auto;
+      }
+
+      .status-message {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .status-message.success {
+        background: rgba(0, 255, 136, 0.2);
+        border: 1px solid #00ff88;
+      }
+
+      .status-message.error {
+        background: rgba(255, 71, 87, 0.2);
+        border: 1px solid #ff4757;
+      }
+
+      .rates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .rate-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .rate-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .rate-card.selected {
+        border-color: #00d4ff;
+        background: rgba(0, 212, 255, 0.1);
+      }
+
+      @media (max-width: 768px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .account-info {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .trading-buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🤖 AI Forex Trading Platform</h1>
+        <div class="account-info">
+          <div class="account-card">
+            <strong>Balance:</strong> $<span id="balance">10,000.00</span>
+          </div>
+          <div class="account-card">
+            <strong>Equity:</strong> $<span id="equity">10,000.00</span>
+          </div>
+          <div class="account-card">
+            <strong>P&L:</strong> $<span id="totalPnL">0.00</span>
+          </div>
+          <div class="account-card">
+            <strong>Open Positions:</strong> <span id="openPositions">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Rates -->
+      <div class="panel">
+        <h2>📊 Live Forex Rates</h2>
+        <div class="rates-grid" id="ratesGrid"></div>
+      </div>
+
+      <div class="main-grid">
+        <!-- AI Analysis Panel -->
+        <div class="panel">
+          <h2>🧠 AI Analysis</h2>
+          <div class="form-group">
+            <label for="currencyPair">Currency Pair:</label>
+            <select id="currencyPair">
+              <option value="EUR/USD">EUR/USD</option>
+              <option value="GBP/USD">GBP/USD</option>
+              <option value="USD/JPY">USD/JPY</option>
+              <option value="USD/CHF">USD/CHF</option>
+              <option value="AUD/USD">AUD/USD</option>
+              <option value="USD/CAD">USD/CAD</option>
+              <option value="NZD/USD">NZD/USD</option>
+              <option value="EUR/GBP">EUR/GBP</option>
+              <option value="EUR/JPY">EUR/JPY</option>
+              <option value="GBP/JPY">GBP/JPY</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="voicePrompt">Analysis Prompt:</label>
+            <textarea
+              id="voicePrompt"
+              rows="3"
+              placeholder="Ask the AI to analyze the currency pair (e.g., 'Should I buy EUR/USD based on current market conditions?')"
+            ></textarea>
+            <div class="voice-controls">
+              <button id="voiceBtn">🎤 Voice Input</button>
+              <button onclick="clearPrompt()">🗑️ Clear</button>
+            </div>
+
+            <!-- Live Transcription Display -->
+            <div id="transcriptionStatus" class="transcription-status">
+              <div id="transcriptionText"></div>
+            </div>
+
+            <!-- Voice Commands Help -->
+            <div class="voice-commands">
+              <h4>Voice Command Examples:</h4>
+              <ul>
+                <li>"Should I buy EUR/USD right now?"</li>
+                <li>"Analyze GBP/JPY for bearish signals"</li>
+                <li>"What's the market outlook for USD/CHF?"</li>
+                <li>"Is it a good time to sell AUD/USD?"</li>
+                <li>"Give me technical analysis for Bitcoin"</li>
+              </ul>
+            </div>
+          </div>
+
+          <button onclick="analyzeMarket()">🔍 Analyze Market</button>
+
+          <div id="analysisResult"></div>
+        </div>
+
+        <!-- Trading Panel -->
+        <div class="panel">
+          <h2>💹 Execute Trade</h2>
+          <div class="form-group">
+            <label for="tradePair">Currency Pair:</label>
+            <select id="tradePair">
+              <option value="EUR/USD">EUR/USD</option>
+              <option value="GBP/USD">GBP/USD</option>
+              <option value="USD/JPY">USD/JPY</option>
+              <option value="USD/CHF">USD/CHF</option>
+              <option value="AUD/USD">AUD/USD</option>
+              <option value="USD/CAD">USD/CAD</option>
+              <option value="NZD/USD">NZD/USD</option>
+              <option value="EUR/GBP">EUR/GBP</option>
+              <option value="EUR/JPY">EUR/JPY</option>
+              <option value="GBP/JPY">GBP/JPY</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeAmount">Amount (Units):</label>
+            <input
+              type="number"
+              id="tradeAmount"
+              value="1000"
+              min="100"
+              step="100"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="leverage">Leverage:</label>
+            <select id="leverage">
+              <option value="1">1:1</option>
+              <option value="5">1:5</option>
+              <option value="10">1:10</option>
+              <option value="20">1:20</option>
+              <option value="50">1:50</option>
+              <option value="100">1:100</option>
+            </select>
+          </div>
+
+          <div class="trading-buttons">
+            <button class="buy-btn" onclick="executeTrade('BUY')">
+              📈 BUY
+            </button>
+            <button class="sell-btn" onclick="executeTrade('SELL')">
+              📉 SELL
+            </button>
+          </div>
+
+          <div id="tradeStatus"></div>
+        </div>
+      </div>
+
+      <!-- TradingView Chart -->
+      <div class="chart-container">
+        <h2>📈 TradingView Chart</h2>
+        <div id="tradingview_chart"></div>
+      </div>
+
+      <!-- Positions -->
+      <div class="positions-container panel">
+        <h2>📋 Open Positions</h2>
+        <div class="positions-grid" id="positionsGrid"></div>
+      </div>
+    </div>
+
+    <!-- TradingView Widget -->
+    <script
+      type="text/javascript"
+      src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+      async
+    >
+      {
+         ` "autosize": true,
+          "symbol": "FX:EURUSD",
+          "interval": "D",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "enable_publishing": false,
+          "backgroundColor": "rgba(255, 255, 255, 0.05)",
+          "gridColor": "rgba(255, 255, 255, 0.1)",
+          "hide_top_toolbar": false,
+          "hide_legend": false,
+          "save_image": false,
+          "container_id": "tradingview_chart"`
+      }
+    </script>
+
+    <script>
+      let recognition;
+      let isRecording = false;
+      let currentAnalysis = null;
+      let interimTranscript = "";
+      let finalTranscript = "";
+
+      // Initialize speech recognition with enhanced features
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        recognition = new (window.SpeechRecognition ||
+          window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function () {
+          isRecording = true;
+          document.getElementById("voiceBtn").classList.add("recording");
+          document.getElementById("voiceBtn").innerHTML =
+            '🎤 Listening... <div class="voice-indicator"><span class="voice-wave"></span><span class="voice-wave"></span><span class="voice-wave"></span><span class="voice-wave"></span></div>';
+
+          const transcriptionStatus = document.getElementById(
+            "transcriptionStatus"
+          );
+          transcriptionStatus.classList.add("active", "listening");
+          document.getElementById("transcriptionText").innerHTML =
+            '<div class="interim-text">Listening for your voice...</div>';
+        };
+
+        recognition.onresult = function (event) {
+          interimTranscript = "";
+          finalTranscript = "";
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          // Update transcription display
+          const transcriptionText =
+            document.getElementById("transcriptionText");
+          transcriptionText.innerHTML = `
+                    ${
+                      finalTranscript
+                        ? `<div class="final-text">${finalTranscript}</div>`
+                        : ""
+                    }
+                    ${
+                      interimTranscript
+                        ? `<div class="interim-text">${interimTranscript}</div>`
+                        : ""
+                    }
+                `;
+
+          // Update the textarea with final transcript
+          if (finalTranscript) {
+            const currentText = document.getElementById("voicePrompt").value;
+            document.getElementById("voicePrompt").value =
+              currentText + finalTranscript + " ";
+            // Reset for next phrase
+            finalTranscript = "";
+          }
+        };
+
+        recognition.onerror = function (event) {
+          console.error("Speech recognition error:", event.error);
+          const transcriptionText =
+            document.getElementById("transcriptionText");
+
+          let errorMessage;
+          switch (event.error) {
+            case "no-speech":
+              errorMessage = "No speech detected. Please try again.";
+              break;
+            case "audio-capture":
+              errorMessage =
+                "No microphone found. Please check your microphone.";
+              break;
+            case "not-allowed":
+              errorMessage =
+                "Microphone access denied. Please allow microphone access.";
+              break;
+            case "network":
+              errorMessage =
+                "Network error. Please check your internet connection.";
+              break;
+            default:
+              errorMessage = `Speech recognition error: ${event.error}`;
+          }
+
+          transcriptionText.innerHTML = `<div style="color: #ff4757;">${errorMessage}</div>`;
+
+          // Auto-hide error after 3 seconds
+          setTimeout(() => {
+            document
+              .getElementById("transcriptionStatus")
+              .classList.remove("active", "listening");
+          }, 3000);
+        };
+
+        recognition.onend = function () {
+          isRecording = false;
+          document.getElementById("voiceBtn").classList.remove("recording");
+          document.getElementById("voiceBtn").innerHTML = "🎤 Voice Input";
+
+          const transcriptionStatus = document.getElementById(
+            "transcriptionStatus"
+          );
+          transcriptionStatus.classList.remove("listening");
+
+          // Show final transcript for a moment before hiding
+          if (finalTranscript || interimTranscript) {
+            setTimeout(() => {
+              transcriptionStatus.classList.remove("active");
+            }, 2000);
+          } else {
+            transcriptionStatus.classList.remove("active");
+          }
+        };
+
+        // Handle speech recognition not supported
+      } else {
+        document.getElementById("voiceBtn").innerHTML = "🎤 Not Supported";
+        document.getElementById("voiceBtn").disabled = true;
+        document.getElementById("voiceBtn").title =
+          "Speech recognition not supported in this browser";
+      }
+
+      // Enhanced voice input function
+      document.getElementById("voiceBtn").onclick = function () {
+        if (!recognition) {
+          alert(
+            "Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari."
+          );
+          return;
+        }
+
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          // Check for microphone permission
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then(function (stream) {
+                // Stop the stream immediately - we just needed permission
+                stream.getTracks().forEach((track) => track.stop());
+                recognition.start();
+              })
+              .catch(function (error) {
+                console.error("Microphone access error:", error);
+                alert("Please allow microphone access to use voice input.");
+              });
+          } else {
+            recognition.start();
+          }
+        }
+      };
+
+      // Enhanced clear prompt function
+      function clearPrompt() {
+        document.getElementById("voicePrompt").value = "";
+        document
+          .getElementById("transcriptionStatus")
+          .classList.remove("active", "listening");
+        if (isRecording) {
+          recognition.stop();
+        }
+      }
+
+      // Add keyboard shortcuts
+      document.addEventListener("keydown", function (event) {
+        // Ctrl/Cmd + Shift + V for voice input
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.shiftKey &&
+          event.key === "V"
+        ) {
+          event.preventDefault();
+          document.getElementById("voiceBtn").click();
+        }
+
+        // Escape to stop recording
+        if (event.key === "Escape" && isRecording) {
+          recognition.stop();
+        }
+      });
+
+      // Load live rates
+      async function loadRates() {
+        try {
+          const response = await fetch("/api/rates");
+          const data = await response.json();
+
+          const ratesGrid = document.getElementById("ratesGrid");
+          ratesGrid.innerHTML = "";
+
+          Object.entries(data.rates).forEach(([pair, rate]) => {
+            const rateCard = document.createElement("div");
+            rateCard.className = "rate-card";
+            rateCard.innerHTML = `
+                        <h3>${pair}</h3>
+                        <div style="font-size: 1.5em; color: #00d4ff; margin: 10px 0;">${rate.toFixed(
+                          5
+                        )}</div>
+                        <small>Click to select</small>
+                    `;
+            rateCard.onclick = () => selectPair(pair);
+            ratesGrid.appendChild(rateCard);
+          });
+        } catch (error) {
+          console.error("Error loading rates:", error);
+        }
+      }
+
+      function selectPair(pair) {
+        // Update selected pair in both dropdowns
+        document.getElementById("currencyPair").value = pair;
+        document.getElementById("tradePair").value = pair;
+
+        // Update visual selection
+        document.querySelectorAll(".rate-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+        event.target.closest(".rate-card").classList.add("selected");
+
+        // Update TradingView chart
+        updateChart(pair);
+      }
+
+      function updateChart(pair) {
+        const symbol = `FX:${pair.replace("/", "")}`;
+        // Note: In production, you'd need to properly update the TradingView widget
+        // For now, this is a placeholder - TradingView widgets need to be recreated
+        console.log(`Chart updated to ${symbol}`);
+      }
+
+      // Analyze market function
+      async function analyzeMarket() {
+        const pair = document.getElementById("currencyPair").value;
+        const prompt = document.getElementById("voicePrompt").value;
+
+        if (!prompt.trim()) {
+          showStatus(
+            "analysisResult",
+            "Please enter a prompt for analysis",
+            "error"
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/analyze", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pair, prompt }),
+          });
+
+          const data = await response.json();
+          currentAnalysis = data;
+
+          const resultDiv = document.getElementById("analysisResult");
+          resultDiv.innerHTML = `
+                    <div class="analysis-result">
+                        <h3>Analysis for ${data.pair}</h3>
+                        <p><strong>Current Price:</strong> ${data.currentPrice.toFixed(
+                          5
+                        )}</p>
+                        <div class="recommendation ${data.analysis.recommendation.toLowerCase()}">
+                            <div>
+                                <strong>${data.analysis.recommendation}</strong>
+                                <p>${data.analysis.reasoning}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div><strong>Confidence:</strong> ${
+                                  data.analysis.confidence
+                                }%</div>
+                                <div><strong>Target:</strong> ${data.analysis.targetPrice.toFixed(
+                                  5
+                                )}</div>
+                                <div><strong>Stop Loss:</strong> ${data.analysis.stopLoss.toFixed(
+                                  5
+                                )}</div>
+                            </div>
+                        </div>
+                        ${
+                          data.analysis.recommendation !== "HOLD"
+                            ? `
+                        <div class="trading-buttons">
+                            <button class="buy-btn" onclick="executeRecommendedTrade('BUY')">Execute BUY</button>
+                            <button class="sell-btn" onclick="executeRecommendedTrade('SELL')">Execute SELL</button>
+                        </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                `;
+        } catch (error) {
+          showStatus(
+            "analysisResult",
+            "Error analyzing market: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      // Execute trade function
+      async function executeTrade(action) {
+        const pair = document.getElementById("tradePair").value;
+        const amount = parseInt(document.getElementById("tradeAmount").value);
+        const leverage = parseInt(document.getElementById("leverage").value);
+
+        if (!amount || amount < 100) {
+          showStatus(
+            "tradeStatus",
+            "Minimum trade amount is 100 units",
+            "error"
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/trade", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pair, action, amount, leverage }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showStatus(
+              "tradeStatus",
+              `${action} position executed successfully for ${pair}`,
+              "success"
+            );
+            updateAccount();
+            loadPositions();
+          } else {
+            showStatus(
+              "tradeStatus",
+              data.error || "Trade execution failed",
+              "error"
+            );
+          }
+        } catch (error) {
+          showStatus(
+            "tradeStatus",
+            "Error executing trade: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      // Execute recommended trade from AI analysis
+      function executeRecommendedTrade(action) {
+        if (!currentAnalysis) return;
+
+        document.getElementById("tradePair").value = currentAnalysis.pair;
+        document.getElementById("tradeAmount").value = "1000";
+        document.getElementById("leverage").value = "10";
+
+        executeTrade(action);
+      }
+
+      // Load positions
+      async function loadPositions() {
+        try {
+          const response = await fetch("/api/positions");
+          const data = await response.json();
+
+          const positionsGrid = document.getElementById("positionsGrid");
+          positionsGrid.innerHTML = "";
+
+          if (data.positions.length === 0) {
+            positionsGrid.innerHTML =
+              '<p style="text-align: center; color: #ccc;">No open positions</p>';
+            return;
+          }
+
+          data.positions
+            .filter((pos) => pos.status === "OPEN")
+            .forEach((position) => {
+              const positionCard = document.createElement("div");
+              const pnlClass = position.pnl >= 0 ? "profit" : "loss";
+              const pnlColor = position.pnl >= 0 ? "#00ff88" : "#ff4757";
+
+              positionCard.className = `position-card ${pnlClass}`;
+              positionCard.innerHTML = `
+                        <div>
+                            <h3>${position.pair} - ${position.action}</h3>
+                            <p><strong>Amount:</strong> ${position.amount.toLocaleString()} units</p>
+                            <p><strong>Leverage:</strong> 1:${
+                              position.leverage
+                            }</p>
+                            <p><strong>Open Price:</strong> ${position.openPrice.toFixed(
+                              5
+                            )}</p>
+                            <p><strong>Current Price:</strong> ${position.currentPrice.toFixed(
+                              5
+                            )}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5em; color: ${pnlColor}; margin-bottom: 10px;">
+                                <strong>${position.pnl.toFixed(2)}</strong>
+                            </div>
+                            <button class="close-btn" onclick="closePosition('${
+                              position.id
+                            }')">Close Position</button>
+                        </div>
+                    `;
+              positionsGrid.appendChild(positionCard);
+            });
+        } catch (error) {
+          console.error("Error loading positions:", error);
+        }
+      }
+
+      // Close position
+      async function closePosition(positionId) {
+        try {
+          const response = await fetch(`/api/positions/${positionId}/close`, {
+            method: "POST",
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            updateAccount();
+            loadPositions();
+          } else {
+            console.error("Error closing position:", data.error);
+          }
+        } catch (error) {
+          console.error("Error closing position:", error);
+        }
+      }
+
+      // Update account info
+      async function updateAccount() {
+        try {
+          const response = await fetch("/api/account");
+          const data = await response.json();
+
+          document.getElementById("balance").textContent =
+            data.balance.toFixed(2);
+          document.getElementById("equity").textContent =
+            data.equity.toFixed(2);
+          document.getElementById("totalPnL").textContent =
+            data.totalPnL.toFixed(2);
+          document.getElementById("openPositions").textContent =
+            data.openPositions;
+
+          // Update P&L color
+          const pnlElement = document.getElementById("totalPnL");
+          pnlElement.style.color = data.totalPnL >= 0 ? "#00ff88" : "#ff4757";
+        } catch (error) {
+          console.error("Error updating account:", error);
+        }
+      }
+
+      // Show status message
+      function showStatus(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        const statusDiv = document.createElement("div");
+        statusDiv.className = `status-message ${type}`;
+        statusDiv.textContent = message;
+
+        // Clear previous status
+        const existingStatus = element.querySelector(".status-message");
+        if (existingStatus) {
+          existingStatus.remove();
+        }
+
+        element.appendChild(statusDiv);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          statusDiv.remove();
+        }, 5000);
+      }
+
+      // Initialize app
+      document.addEventListener("DOMContentLoaded", function () {
+        loadRates();
+        updateAccount();
+        loadPositions();
+
+        // Update rates every 5 seconds
+        setInterval(loadRates, 5000);
+
+        // Update account and positions every 3 seconds
+        setInterval(() => {
+          updateAccount();
+          loadPositions();
+        }, 3000);
+      });
+
+      // Sync currency pair selections
+      document
+        .getElementById("currencyPair")
+        .addEventListener("change", function () {
+          document.getElementById("tradePair").value = this.value;
+          updateChart(this.value);
+        });
+
+      document
+        .getElementById("tradePair")
+        .addEventListener("change", function () {
+          document.getElementById("currencyPair").value = this.value;
+          updateChart(this.value);
+        });
+    </script>
+  </body>
+</html>
